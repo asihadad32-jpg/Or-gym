@@ -1,0 +1,14 @@
+{
+  "name": "Or's Gym ⚡",
+  "short_name": "Or's Gym",
+  "description": "האימון של אור",
+  "start_url": "./or-gym.html",
+  "display": "standalone",
+  "background_color": "#060d1a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": [
+    {"src": "icon-or-192.png","sizes": "192x192","type": "image/png","purpose": "any maskable"},
+    {"src": "icon-or-512.png","sizes": "512x512","type": "image/png","purpose": "any maskable"}
+  ]
+}
