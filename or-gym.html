@@ -856,14 +856,25 @@ function showSkippedPrompt(){
   const ic=el('span');ic.style.fontSize='18px';ic.style.flexShrink='0';ic.textContent='💡';
   const tx=el('p');tx.textContent='יש '+skippedQueue.length+' תרגילים שדולגו. לחזור אליהם?';
   inf.append(ic,tx);wrap.append(t,inf);
-  skippedQueue.forEach((idx,qi)=>{
-    const e=WORKOUT[idx];
+  skippedQueue.slice().forEach((skIdx,qi)=>{
+    const e=WORKOUT[skIdx];
     const card=el('div','skipped-card');
     const cn=el('div','skipped-card-name');cn.textContent=e.icon+' '+e.name;
     const bd=el('button','btn-main');bd.style.cssText='padding:12px;font-size:15px;box-shadow:none;animation:none;';bd.textContent='✓ בצע עכשיו';
-    bd.onclick=(()=>{ const i=idx,q=qi; return ()=>{ skippedQueue.splice(q,1);exIdx=i;setsDone=0;updateProgress();renderExercise(); }; })();
+    bd.onclick=(()=>{ const i=skIdx; return ()=>{
+      const pos=skippedQueue.indexOf(i);
+      if(pos>=0) skippedQueue.splice(pos,1);
+      exIdx=i;setsDone=0;currentExLog=null;
+      updateProgress();renderExercise();
+    }; })();
     const ba=el('button','btn-skip');ba.textContent='✗ ויתרתי';
-    ba.onclick=(()=>{ const i=idx,q=qi; return ()=>{ skippedQueue.splice(q,1);sessionLog.push({name:WORKOUT[i].name,weight:0,reps:0,rest:0,plannedSets:WORKOUT[i].defaultSets,sets:[],setDetails:[],skipped:true,abandoned:true});if(skippedQueue.length===0)renderSummary();else showSkippedPrompt(); }; })();
+    ba.onclick=(()=>{ const i=skIdx; return ()=>{
+      const pos=skippedQueue.indexOf(i);
+      if(pos>=0) skippedQueue.splice(pos,1);
+      sessionLog.push({name:WORKOUT[i].name,weight:0,reps:0,rest:0,plannedSets:WORKOUT[i].defaultSets,sets:[],setDetails:[],skipped:true,abandoned:true});
+      if(skippedQueue.length===0) renderSummary();
+      else showSkippedPrompt();
+    }; })();
     card.append(cn,bd,ba);wrap.appendChild(card);
   });
   const be=el('button','btn-secondary');be.textContent='סיים אימון →';be.onclick=renderSummary;be.style.marginTop='8px';
