@@ -210,6 +210,10 @@ html{overscroll-behavior-y:none;}
 .sess-sets{display:flex;flex-wrap:wrap;gap:5px}
 .sess-set{background:#060d1a;border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:11px;color:var(--muted)}
 
+.btn-do-skipped{background:#1a2810;border:1px solid #3a5020;border-radius:10px;color:#86efac;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);text-align:right;width:100%}
+.btn-do-skipped:active{background:#243818}
+.btn-do-skipped{background:#1a2810;border:1px solid #3a5020;border-radius:10px;color:#86efac;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);text-align:right;width:100%;margin-top:4px}
+.btn-do-skipped:active{background:#243818}
 </style>
 </head>
 <body>
@@ -759,6 +763,32 @@ function renderExercise(){
   if(!isTimedEx) btnDone.onclick=handleAction;
 
   const secRow=el('div','sec-btn-row');
+
+  // תרגילים שדולגו — ניתן לבצע מיד
+  if(skippedQueue.length>0){
+    const skipBanner=el('div','skipped-banner');
+    skipBanner.textContent='⏭ '+skippedQueue.length+' תרגילים ממתינים:';
+    secRow.appendChild(skipBanner);
+    skippedQueue.slice().forEach(function(skIdx){
+      const skEx=WORKOUT[skIdx];
+      if(!skEx) return;
+      const skBtn=el('button','btn-do-skipped');
+      skBtn.textContent='▶ '+skEx.icon+' '+skEx.name;
+      skBtn.onclick=(function(i){ return function(){
+        // Save current position to skippedQueue if mid-exercise
+        if(currentExLog&&currentExLog.sets&&currentExLog.sets.length>0){
+          if(!skippedQueue.includes(exIdx)) skippedQueue.push(exIdx);
+          sessionLog.push(currentExLog);
+        }
+        const pos=skippedQueue.indexOf(i);
+        if(pos>=0) skippedQueue.splice(pos,1);
+        currentExLog=null;setsDone=0;
+        exIdx=i;updateProgress();renderExercise();
+      }; })(skIdx);
+      secRow.appendChild(skBtn);
+    });
+  }
+
   if(e.type==='exercise'&&!isTimedEx&&totalSets>1){
     const setCtrl=el('div','set-ctrl-row');
     const addBtn=el('button','btn-add-set');addBtn.textContent='+ סט';
